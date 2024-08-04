@@ -88,6 +88,7 @@ hoon-language-server                      hoon_ls
 html-lsp                                  html
 htmx-lsp                                  htmx
 hydra-lsp                                 hydra_lsp
+hyprls                                    hyprls
 intelephense                              intelephense
 java-language-server                      java_language_server
 jdtls                                     jdtls
@@ -126,6 +127,7 @@ ols                                       ols
 omnisharp                                 omnisharp
 opencl-language-server                    opencl_ls
 openscad-lsp                              openscad_lsp
+pbls                                      pbls
 perlnavigator                             perlnavigator
 pest-language-server                      pest_ls
 phpactor                                  phpactor
@@ -145,6 +147,7 @@ quick-lint-js                             quick_lint_js
 r-languageserver                          r_language_server
 raku-navigator                            raku_navigator
 reason-language-server                    reason_ls
+regal                                     regal
 regols                                    regols
 remark-language-server                    remark_ls
 rescript-language-server                  rescriptls
@@ -176,6 +179,8 @@ sqlls                                     sqlls
 sqls                                      sqls
 standardrb                                standardrb
 starlark-rust                             starlark_rust
+starpls                                   starpls
+steep                                     steep
 stimulus-language-server                  stimulus_ls
 stylelint-lsp                             stylelint_lsp
 svelte-language-server                    svelte
@@ -188,6 +193,7 @@ teal-language-server                      teal_ls
 templ                                     templ
 terraform-ls                              terraformls
 texlab                                    texlab
+textlsp                                   textlsp
 tflint                                    tflint
 shopify-theme-check                       theme_check
 thriftls                                  thriftls
