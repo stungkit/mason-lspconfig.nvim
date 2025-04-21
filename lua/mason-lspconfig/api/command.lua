@@ -10,7 +10,7 @@ local function parse_packages_from_user_args(user_args)
     local Package = require "mason-core.package"
     local mappings = require "mason-lspconfig.mappings"
     local server_mapping = mappings.get_mason_map()
-    local language_map = mappings.get_language_map()
+    local filetype_map = mappings.get_filetype_map()
 
     return _.filter_map(function(server_specifier)
         local server_name, version = Package.Parse(server_specifier)
@@ -19,15 +19,18 @@ local function parse_packages_from_user_args(user_args)
             .of_nilable(server_mapping.lspconfig_to_package[server_name])
             -- 2. if not, check if it's a language specifier (e.g., "typescript" or "java")
             :or_(function()
-                return Optional.of_nilable(language_map[server_name])
+                return Optional
+                    .of_nilable(filetype_map[server_name])
                     :if_not_present(function()
                         notify(("Could not find LSP server %q."):format(server_name), vim.log.levels.ERROR)
                     end)
+                    -- Remove server configurations that aren't available for installation via Mason
+                    :map(
+                        _.filter_map(function(server_name)
+                            return Optional.of_nilable(server_mapping.lspconfig_to_package[server_name])
+                        end)
+                    )
                     :map(function(package_names)
-                        package_names = _.filter(function(package_name)
-                            return server_mapping.package_to_lspconfig[package_name] ~= nil
-                        end, package_names)
-
                         if #package_names == 0 then
                             return nil
                         end
@@ -135,7 +138,7 @@ _G.mason_lspconfig_completion = {
         local available_servers = require("mason-lspconfig").get_available_servers()
         local mappings = require "mason-lspconfig.mappings"
         local sort_deduped = _.compose(_.sort_by(_.identity), _.uniq_by(_.identity))
-        local completions = sort_deduped(_.concat(_.keys(mappings.get_language_map()), available_servers))
+        local completions = sort_deduped(_.concat(_.keys(mappings.get_filetype_map()), available_servers))
         return table.concat(completions, "\n")
     end,
     installed_server_completion = function()
