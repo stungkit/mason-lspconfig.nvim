@@ -9,20 +9,25 @@ Author: William Boman
 INTRODUCTION                                    *mason-lspconfig-introduction*
 
 `mason-lspconfig.nvim` closes some gaps that exist between `mason.nvim` and
-`lspconfig`. Its main responsibilities are to:
+`nvim-lspconfig`. Its main responsibilities are to:
 
 - allow you to (i) automatically install, and (ii) automatically enable
   installed servers
 - provide extra convenience APIs such as the `:LspInstall` command
 - provide additional LSP configurations for a few servers
-- translate between `lspconfig` server names and `mason.nvim` package names
+- translate between `nvim-lspconfig` server names and `mason.nvim` package names
   (e.g. `lua_ls <-> lua-language-server`)
 
 ==============================================================================
 REQUIREMENTS                                    *mason-lspconfig-requirements*
 
-`mason-lspconfig` requires `mason.nvim` & `lspconfig` to be installed. Note
-that `lspconfig` needs to be available in |rtp| before you set up `mason-lspconfig`.
+`mason-lspconfig` requires `mason.nvim` and `nvim-lspconfig` to be installed.
+Note that `nvim-lspconfig` needs to be available in |rtp| before you set up
+`mason-lspconfig`.
+
+- `neovim >= 0.11.0`
+- `mason.nvim >= 2.0.0`
+- `nvim-lspconfig >= 2.0.0`
 
 ==============================================================================
 QUICK START                                       *mason-lspconfig-quickstart*
@@ -52,14 +57,14 @@ servers for you by default, see |mason-automatic-enable|.
 -----------------
 Installation of servers
 
-To install an LSP server supported by lspconfig (and mason.nvim) you may use
-the `:LspInstall` command, like so:
+To install an LSP server supported by `nvim-lspconfig` (and `mason.nvim`) you
+may use the `:LspInstall` command, like so:
 >vim
     :LspInstall rust_analyzer lua_ls
 <
 This command is more or less an alias of the |:MasonInstall| command, except
 that it only accepts LSP servers and - more importantly - only accepts
-lspconfig server names (as opposed to mason.nvim package names).
+`nvim-lspconfig` server names (as opposed to `mason.nvim` package names).
 
 You may also run the same command without any arguments. This will prompt you
 with a selection of servers that are recommended for the filetype of the
@@ -77,7 +82,7 @@ INSTALLING AN LSP SERVER
 :LspInstall [<server>...]
 <
 Installs the provided servers. This command only accepts servers that have a
-corresponding server configuration in `lspconfig`.
+corresponding server configuration in `nvim-lspconfig`.
 
 You may also provide a language, like `:LspInstall typescript`. This will
 prompt you with a selection of all available servers for that given language.
@@ -151,11 +156,9 @@ get_installed_servers()
     Returns the installed LSP servers supported by lspconfig.
 
     Note: ~
-        The returned strings are the lspconfig server names, not the mason
-        package names. For example, "lua_ls" is returned instead of
-        "lua-language-server". This is useful if you want to loop through the
-        table and use its values to directly interact with lspconfig (for
-        example setting up all installed servers).
+        The returned strings are the nvim-lspconfig server names, not the
+        Mason package names. For example, "lua_ls" is returned instead of
+        "lua-language-server".
 
     Returns: ~
         string[]
@@ -169,11 +172,9 @@ get_available_servers({filter})
     Returns the available (both installed & uninstalled) LSP servers.
 
     Note: ~
-        The returned strings are the lspconfig server names, not the mason
-        package names. For example, "lua_ls" is returned instead of
-        "lua-language-server". This is useful if you want to loop through the
-        table and use its values to directly interact with lspconfig (for
-        example setting up all installed servers).
+        The returned strings are the nvim-lspconfig server names, not the
+        Mason package names. For example, "lua_ls" is returned instead of
+        "lua-language-server".
 
     Parameters: ~
         {filter}  (table|nil) A table with key-value pairs used to
@@ -190,7 +191,9 @@ get_available_servers({filter})
 
                                               *mason-lspconfig.get_mappings()*
 get_mappings()
-    Returns the server name mappings between lspconfig and Mason.
+    Returns:
+        - server name mappings between nvim-lspconfig and Mason.
+        - filetype mappings for supported servers
 
     Returns: ~
         {
@@ -198,5 +201,9 @@ get_mappings()
             package_to_lspconfig: table<string, string>,
             filetypes: table<string, string[]>
         }
+
+    Note: ~
+        This function only returns nvim-lspconfig servers that are recognized
+        by Mason.
 
  vim:tw=78:ft=help:norl:expandtab:sw=4

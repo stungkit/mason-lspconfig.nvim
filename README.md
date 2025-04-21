@@ -38,7 +38,7 @@ This plugin's main responsibilities are to:
 - allow you to (i) automatically install, and (ii) automatically enable installed servers
 - provide extra convenience APIs such as the `:LspInstall` command
 - provide additional LSP configurations for a few servers
-- translate between `lspconfig` server names and `mason.nvim` package names (e.g. `lua_ls <-> lua-language-server`)
+- translate between `nvim-lspconfig` server names and `mason.nvim` package names (e.g. `lua_ls <-> lua-language-server`)
 
 > [!NOTE]
 > Since the introduction of [`:h vim.lsp.config`](https://neovim.io/doc/user/lsp.html#vim.lsp.config()) in Neovim 0.11,
@@ -50,9 +50,9 @@ This plugin's main responsibilities are to:
 
 > `:h mason-lspconfig-requirements`
 
-- neovim `>= 0.11.0`
+- `neovim >= 0.11.0`
 - `mason.nvim >= 2.0.0`
-- `lspconfig >= 2.0.0`
+- `nvim-lspconfig >= 2.0.0`
 
 # Installation
 
