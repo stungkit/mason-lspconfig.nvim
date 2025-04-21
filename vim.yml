@@ -44,6 +44,9 @@ globals:
     before_each:
         args:
             - type: function
+    after_each:
+        args:
+            - type: function
     it:
         args:
             - type: string

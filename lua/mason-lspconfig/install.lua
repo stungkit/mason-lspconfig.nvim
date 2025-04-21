@@ -1,5 +1,5 @@
+local mappings = require "mason-lspconfig.mappings"
 local notify = require "mason-lspconfig.notify"
-local server_mapping = require "mason-lspconfig.mappings.server"
 
 local M = {}
 
@@ -7,12 +7,12 @@ local M = {}
 ---@param version string?
 ---@return InstallHandle
 function M.install(pkg, version)
-    local lspconfig_name = server_mapping.package_to_lspconfig[pkg.name]
+    local lspconfig_name = mappings.get_mason_map().package_to_lspconfig[pkg.name]
     notify(("[mason-lspconfig.nvim] installing %s"):format(lspconfig_name))
-    return pkg:install({ version = version }):once(
-        "closed",
-        vim.schedule_wrap(function()
-            if pkg:is_installed() then
+    return pkg:install(
+        { version = version },
+        vim.schedule_wrap(function(success, err)
+            if success then
                 notify(("[mason-lspconfig.nvim] %s was successfully installed"):format(lspconfig_name))
             else
                 notify(

@@ -1,6 +1,6 @@
 *mason-lspconfig.nvim*
 
-Minimum version of neovim: 0.9.0
+Minimum version of Neovim: 0.11.0
 
 Author: William Boman
                                        Type |gO| to see the table of contents.
@@ -11,32 +11,18 @@ INTRODUCTION                                    *mason-lspconfig-introduction*
 `mason-lspconfig.nvim` closes some gaps that exist between `mason.nvim` and
 `lspconfig`. Its main responsibilities are to:
 
--   register a setup hook with `lspconfig` that ensures servers installed with
-    `mason.nvim` are set up with the necessary configuration
--   provide extra convenience APIs such as the `:LspInstall` command
--   allow you to (i) automatically install, and (ii) automatically set up a
-    predefined list of servers
--   translate between `lspconfig` server names and `mason.nvim` package names
-    (e.g. `lua_ls <-> lua-language-server`)
-
-It is recommended to use this extension if you use `mason.nvim` and
-`lspconfig` (it's strongly recommended for Windows users).
-
-Note: ~
-    This plugin uses the `lspconfig` server names in the APIs it exposes - not
-    `mason.nvim` package names. See these tables for a complete mapping:
-    - :h |mason-lspconfig-server-map|
-    - https://github.com/williamboman/mason-lspconfig.nvim/blob/main/doc/server-mapping.md
+- allow you to (i) automatically install, and (ii) automatically enable
+  installed servers
+- provide extra convenience APIs such as the `:LspInstall` command
+- provide additional LSP configurations for a few servers
+- translate between `lspconfig` server names and `mason.nvim` package names
+  (e.g. `lua_ls <-> lua-language-server`)
 
 ==============================================================================
 REQUIREMENTS                                    *mason-lspconfig-requirements*
 
-`mason-lspconfig` requires `mason.nvim` & `lspconfig` to be installed.
-Note that `lspconfig` needs to be available in |rtp| by the time you set up
-`mason-lspconfig`.
-
-Make sure to set up `mason` and `mason-lspconfig.nvim` before setting up
-servers via `lspconfig`.
+`mason-lspconfig` requires `mason.nvim` & `lspconfig` to be installed. Note
+that `lspconfig` needs to be available in |rtp| before you set up `mason-lspconfig`.
 
 ==============================================================================
 QUICK START                                       *mason-lspconfig-quickstart*
@@ -44,17 +30,8 @@ QUICK START                                       *mason-lspconfig-quickstart*
 -----------------
 Setting up mason-lspconfig.nvim
 
-It's important that you set up the plugins in the following order:
-
-1. `mason.nvim`
-2. `mason-lspconfig.nvim`
-3. Setup servers via `lspconfig`
-
-Note: ~
-    `lspconfig` needs to be available in |rtp| so that `mason-lspconfig` can
-    successfully call `require("lspconfig")` (|lua-require|) during setup.
-    Pay extra attention to this if you lazy-load plugins, or somehow "chain"
-    the loading of plugins via your plugin manager.
+It's important that you set up `mason.nvim` and have `nvim-lspconfig`
+available in |'runtimepath'| before setting up `mason-lspconfig.nvim`.
 
 To enable the `mason-lspconfig` plugin, call the `setup()` function, like so:
 >lua
@@ -68,14 +45,9 @@ Setting up servers
 
 Next, you're ready to set up the servers you want to use. Refer to lspconfig's
 documentation |lspconfig-quickstart| for more information on how to do so!
->lua
-    require("lspconfig").lua_ls.setup {}
-    require("lspconfig").rust_analyzer.setup {}
-<
-Automatic server setup (advanced feature): ~
-    Refer to |mason-lspconfig-dynamic-server-setup| (advanced feature) for an
-    alternative method of setting up servers that doesn't require you to
-    imperatively set up each server one by one.
+
+`mason-lspconfig.nvim` will automatically enable (|vim.lsp.enable()|) installed
+servers for you by default, see |mason-automatic-enable|.
 
 -----------------
 Installation of servers
@@ -143,47 +115,29 @@ Example:
         ---@type string[]
         ensure_installed = {},
 
-        -- See `:h mason-lspconfig.setup_handlers()`
-        ---@type table<string, fun(server_name: string)>?
-        handlers = nil,
+        -- Whether installed servers should automatically be enabled via `:h vim.lsp.enable()`.
+        automatic_enable = true
     }
 <
 
 ==============================================================================
-AUTOMATIC SERVER SETUP                *mason-lspconfig-automatic-server-setup*
-                                        *mason-lspconfig-dynamic-server-setup*
+AUTOMATICALLY ENABLE SERVERS                          *mason-automatic-enable*
 
+By default, `mason-lspconfig` will automatically enable servers you have
+installed in Mason. This means you don't have to call |vim.lsp.enable()|
+yourself.
 
-`mason-lspconfig` provides extra, opt-in, functionality that allows you to
-automatically set up LSP servers installed via `mason.nvim` without having to
-manually add each server setup to your Neovim configuration. It also makes it
-possible to use newly installed servers without having to restart Neovim!
-
-Example:
+To disable this feature:
 >lua
-    require("mason").setup()
-    require("mason-lspconfig").setup()
-
-    require("mason-lspconfig").setup_handlers {
-        -- The first entry (without a key) will be the default handler
-        -- and will be called for each installed server that doesn't have
-        -- a dedicated handler.
-        function (server_name) -- default handler (optional)
-            require("lspconfig")[server_name].setup {}
-        end,
-        -- Next, you can provide a dedicated handler for specific servers.
-        -- For example, a handler override for the `rust_analyzer`:
-        ["rust_analyzer"] = function ()
-            require("rust-tools").setup {}
-        end
-    }
+    require("mason-lspconfig").setup({
+        automatic_enable = false
+    })
 <
-Note: ~
-    If you use this approach, make sure you don't also manually set up servers
-    directly via `lspconfig` as this will cause servers to be set up more than
-    once.
 
-Refer to |mason-lspconfig.setup_handlers()| for more information.
+Note: ~
+    Servers that you have installed outside of Mason will not be recognized by
+    this feature. You will still have to manually enable (|vim.lsp.enable()|)
+    such servers yourself.
 
 ==============================================================================
 Lua module: mason-lspconfig
@@ -191,75 +145,6 @@ Lua module: mason-lspconfig
                                                      *mason-lspconfig.setup()*
 setup({config})
     Sets up mason with the provided {config} (see |mason-lspconfig-settings|).
-
-                                            *mason-lspconfig.setup_handlers()*
-setup_handlers({handlers})
-    Advanced feature ~
-        This is an advanced, opt-in, feature that requires some careful
-        reading of the documentation.
-
-        The recommended method to set up servers with lspconfig is to do so by
-        following their guides, see |lspconfig-quickstart|.
-
-    Registers the provided {handlers}, to be called by mason when an installed
-    server supported by lspconfig is ready to be set up.
-
-    When this function is called, all servers that are currently installed
-    will be considered ready to be set up. When a new server is installed
-    during a session, it will be considered ready to be set up when
-    installation succeeds.
-
-    {handlers} is a table where the keys are the name of an lspconfig server,
-    and the values are the function to be called when that server is ready to
-    be set up (i.e. is installed).
-
-    You may also pass a default handler that will be called when no dedicated
-    handler is provided. This is done by providing a function without a key
-    (see example below).
-
-   Note: ~
-       The server names provided as keys are the lspconfig server names, not
-       mason's package names, so for example instead of "lua-language-server"
-       it's "lua_ls".
-
-   Example: ~
->lua
-       local handlers = {
-           -- The first entry (without a key) will be the default handler
-           -- and will be called for each installed server that doesn't have
-           -- a dedicated handler.
-           function (server_name) -- default handler (optional)
-               require("lspconfig")[server_name].setup {}
-           end,
-           -- Next, you can provide targeted overrides for specific servers.
-           ["rust_analyzer"] = function ()
-               require("rust-tools").setup {}
-           end,
-           ["lua_ls"] = function ()
-               local lspconfig = require("lspconfig")
-               lspconfig.lua_ls.setup {
-                   settings = {
-                       Lua = {
-                           diagnostics = {
-                               globals = { "vim" }
-                           }
-                       }
-                   }
-               }
-           end,
-       }
-
-       -- alt 1. Either pass handlers when setting up mason-lspconfig:
-       require("mason-lspconfig").setup({ handlers = handlers })
-
-       -- alt 2. or call the .setup_handlers() function.
-       require("mason-lspconfig").setup_handlers(handlers)
-<
-
-    See also: ~
-        You may achieve similar behaviour by manually looping through the
-        installed servers (see |mason-lspconfig.get_installed_servers()|) and
-        setting each one up.
 
                                      *mason-lspconfig.get_installed_servers()*
 get_installed_servers()
@@ -309,8 +194,9 @@ get_mappings()
 
     Returns: ~
         {
-            lspconfig_to_mason: table<string, string>,
-            mason_to_lspconfig: table<string, string>
+            lspconfig_to_package: table<string, string>,
+            package_to_lspconfig: table<string, string>,
+            filetypes: table<string, string[]>
         }
 
  vim:tw=78:ft=help:norl:expandtab:sw=4

@@ -12,4 +12,7 @@ return Pkg:new {
         id = "pkg:mason/dummy@1.0.0",
         install = function() end,
     },
+    neovim = {
+        lspconfig = "dummylsp",
+    },
 }

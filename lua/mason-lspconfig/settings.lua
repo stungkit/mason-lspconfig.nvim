@@ -6,9 +6,8 @@ local DEFAULT_SETTINGS = {
     ---@type string[]
     ensure_installed = {},
 
-    -- See `:h mason-lspconfig.setup_handlers()`
-    ---@type table<string, fun(server_name: string)>?
-    handlers = nil,
+    -- Whether installed servers should automatically be enabled via `:h vim.lsp.enable()`.
+    automatic_enable = true,
 }
 
 M._DEFAULT_SETTINGS = DEFAULT_SETTINGS

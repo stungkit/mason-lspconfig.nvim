@@ -14,4 +14,7 @@ return Pkg:new {
             error("fail-dummy doesn't want to be installed", 0)
         end,
     },
+    neovim = {
+        lspconfig = "fail_dummylsp",
+    },
 }
