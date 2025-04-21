@@ -5,22 +5,6 @@ local platform = require "mason-core.platform"
 
 local memoized_set = _.memoize(_.set_of)
 
----@param server_name string
-local function should_auto_install(server_name)
-    if platform.is_headless then
-        return false
-    end
-    local settings = require "mason-lspconfig.settings"
-
-    if settings.current.automatic_installation == true then
-        return true
-    end
-    if type(settings.current.automatic_installation) == "table" then
-        return not memoized_set(settings.current.automatic_installation.exclude)[server_name]
-    end
-    return false
-end
-
 ---@param lspconfig_server_name string
 local function resolve_server_config_factory(lspconfig_server_name)
     local Optional = require "mason-core.optional"
@@ -83,19 +67,6 @@ return function()
                 else
                     log.error("Failed to expand cmd path", config.name, config.cmd)
                 end
-            end
-        elseif should_auto_install(config.name) then
-            local ok, pkg = pcall(registry.get_package, pkg_name)
-            if ok then
-                require("mason-lspconfig.install").install(pkg):once(
-                    "closed",
-                    vim.schedule_wrap(function()
-                        if pkg:is_installed() then
-                            -- reload config
-                            require("lspconfig")[config.name].setup(config)
-                        end
-                    end)
-                )
             end
         end
     end)
