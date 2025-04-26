@@ -25,6 +25,7 @@
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Setup](#setup)
+- [Automatically enable installed servers](#automatically-enable-installed-servers)
 - [Commands](#commands)
 - [Configuration](#configuration)
   - [Default configuration](#default-configuration)
@@ -35,7 +36,7 @@
 
 This plugin's main responsibilities are to:
 
-- allow you to (i) automatically install, and (ii) automatically enable installed servers
+- allow you to (i) automatically install, and (ii) automatically enable (`vim.lsp.enable()`) installed servers
 - provide extra convenience APIs such as the `:LspInstall` command
 - provide additional LSP configurations for a few servers
 - translate between `nvim-lspconfig` server names and `mason.nvim` package names (e.g. `lua_ls <-> lua-language-server`)
@@ -85,7 +86,7 @@ Refer to the [Configuration](#configuration) section for information about which
 
 # Automatically enable installed servers
 
-`mason-lspconfig.nvim` will automatically enable installed servers for you by default.
+`mason-lspconfig.nvim` will automatically enable (`vim.lsp.enable()`) installed servers for you by default.
 
 To disable this feature:
 
@@ -103,7 +104,7 @@ require("mason-lspconfig").setup {
         exclude = {
             "rust_analyzer",
             "ts_ls"
-            }
+        }
     }
 }
 ```
@@ -118,6 +119,10 @@ require("mason-lspconfig").setup {
     }
 }
 ```
+
+> [!NOTE]
+> This will only enable servers that are installed via Mason. It will not recognize servers installed elsewhere on your
+> system.
 
 # Commands
 

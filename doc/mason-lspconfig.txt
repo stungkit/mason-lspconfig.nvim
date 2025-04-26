@@ -12,7 +12,7 @@ INTRODUCTION                                    *mason-lspconfig-introduction*
 `nvim-lspconfig`. Its main responsibilities are to:
 
 - allow you to (i) automatically install, and (ii) automatically enable
-  installed servers
+  (`vim.lsp.enable()`) installed servers
 - provide extra convenience APIs such as the `:LspInstall` command
 - provide additional LSP configurations for a few servers
 - translate between `nvim-lspconfig` server names and `mason.nvim` package names
