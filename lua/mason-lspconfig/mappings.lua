@@ -4,13 +4,6 @@ local registry = require "mason-registry"
 local M = {}
 
 function M.get_mason_map()
-    if not registry.get_all_package_specs then
-        return {
-            lspconfig_to_package = {},
-            package_to_lspconfig = {},
-        }
-    end
-
     ---@type table<string, string>
     local package_to_lspconfig = {}
     for _, pkg_spec in ipairs(registry.get_all_package_specs()) do

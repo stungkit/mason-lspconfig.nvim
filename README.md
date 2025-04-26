@@ -83,6 +83,42 @@ runtimepath`](https://neovim.io/doc/user/options.html#'runtimepath') before sett
 
 Refer to the [Configuration](#configuration) section for information about which settings are available.
 
+# Automatically enable installed servers
+
+`mason-lspconfig.nvim` will automatically enable installed servers for you by default.
+
+To disable this feature:
+
+```lua
+require("mason-lspconfig").setup {
+    automatic_enable = false
+}
+```
+
+To exclude certain servers from being enabled:
+
+```lua
+require("mason-lspconfig").setup {
+    automatic_enable = {
+        exclude = {
+            "rust_analyzer",
+            "ts_ls"
+            }
+    }
+}
+```
+
+Alternatively, to only enable specific servers:
+
+```lua
+require("mason-lspconfig").setup {
+    automatic_enable = {
+        "lua_ls",
+        "vimls"
+    }
+}
+```
+
 # Commands
 
 > `:h mason-lspconfig-commands`
@@ -114,6 +150,22 @@ local DEFAULT_SETTINGS = {
     ensure_installed = {},
 
     -- Whether installed servers should automatically be enabled via `:h vim.lsp.enable()`.
-    automatic_enable = true
+    --
+    -- To exclude certain servers from being automatically enabled:
+    -- ```lua
+    --   automatic_enable = {
+    --     exclude = { "rust_analyzer", "ts_ls" }
+    --   }
+    -- ```
+    --
+    -- To only enable certain servers to be automatically enabled:
+    -- ```lua
+    --   automatic_enable = {
+    --     "lua_ls",
+    --     "vimls"
+    --   }
+    -- ```
+    ---@type boolean | string[] | { exclude: string[] }
+    automatic_enable = true,
 }
 ```

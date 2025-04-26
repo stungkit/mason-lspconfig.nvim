@@ -10,14 +10,7 @@ local registry = require "mason-registry"
 
 describe("mason-lspconfig setup", function()
     before_each(function()
-        local settings = require "mason-lspconfig.settings"
-        settings.set(settings._DEFAULT_SETTINGS)
-
-        for _, pkg in ipairs(registry.get_all_packages()) do
-            if pkg:is_installed() then
-                pkg:uninstall()
-            end
-        end
+        a.run_blocking(a.wait, vim.schedule)
     end)
 
     it("should set up user commands", function()
@@ -39,6 +32,37 @@ describe("mason-lspconfig setup", function()
             nargs = "+",
             complete = "custom",
         }(user_commands["LspUninstall"]))
+    end)
+
+    it(
+        "should set up package aliases",
+        async_test(function()
+            spy.on(registry, "register_package_aliases")
+
+            mason_lspconfig.setup {}
+            a.wait(vim.schedule)
+
+            assert.spy(registry.register_package_aliases).was_called(1)
+            assert.spy(registry.register_package_aliases).was_called_with {
+                ["dummy"] = { "dummylsp" },
+                ["dummy2"] = { "dummy2lsp" },
+                ["fail_dummy"] = { "fail_dummylsp" },
+            }
+        end)
+    )
+end)
+
+describe("mason-lspconfig.setup() :: feature :: ensure_installed", function()
+    before_each(function()
+        a.run_blocking(a.wait, vim.schedule)
+        local settings = require "mason-lspconfig.settings"
+        settings.set(settings._DEFAULT_SETTINGS)
+
+        for _, pkg in ipairs(registry.get_all_packages()) do
+            if pkg:is_installed() then
+                pkg:uninstall()
+            end
+        end
     end)
 
     it(
@@ -113,32 +137,65 @@ describe("mason-lspconfig setup", function()
             end)
         end)
     )
+end)
+
+describe("mason-lspconfig.setup() :: feature :: automatic_enable", function()
+    before_each(function()
+        a.run_blocking(a.wait, vim.schedule)
+        local settings = require "mason-lspconfig.settings"
+        settings.set(settings._DEFAULT_SETTINGS)
+
+        spy.on(vim.lsp, "enable")
+        stub(registry, "get_installed_package_names").returns {
+            "dummy",
+            "dummy2",
+        }
+    end)
 
     it(
-        "should set up package aliases",
+        "should enable all installed servers",
         async_test(function()
-            stub(registry, "register_package_aliases")
+            mason_lspconfig.setup {
+                automatic_enable = true,
+            }
 
-            local mapping_mock = stub(
-                require "mason-lspconfig.mappings",
-                "get_mason_map",
-                mockx.returns {
-                    package_to_lspconfig = {
-                        ["rust-analyzer"] = "rust_analyzer",
-                        ["typescript-language-server"] = "ts_ls",
-                    },
-                }
-            )
-
-            mason_lspconfig.setup {}
             a.wait(vim.schedule)
 
-            assert.spy(registry.register_package_aliases).was_called(1)
-            assert.spy(registry.register_package_aliases).was_called_with {
-                ["rust-analyzer"] = { "rust_analyzer" },
-                ["typescript-language-server"] = { "ts_ls" },
+            assert.spy(vim.lsp.enable).was_called(2)
+            assert.spy(vim.lsp.enable).was_called_with "dummylsp"
+            assert.spy(vim.lsp.enable).was_called_with "dummy2lsp"
+        end)
+    )
+
+    it(
+        "should exclude servers",
+        async_test(function()
+            mason_lspconfig.setup {
+                automatic_enable = {
+                    exclude = { "dummy2lsp" },
+                },
             }
-            mapping_mock:revert()
+
+            a.wait(vim.schedule)
+
+            assert.spy(vim.lsp.enable).was_called(1)
+            assert.spy(vim.lsp.enable).was_called_with "dummylsp"
+        end)
+    )
+
+    it(
+        "should only enable specified servers",
+        async_test(function()
+            mason_lspconfig.setup {
+                automatic_enable = {
+                    "dummy2lsp",
+                },
+            }
+
+            a.wait(vim.schedule)
+
+            assert.spy(vim.lsp.enable).was_called(1)
+            assert.spy(vim.lsp.enable).was_called_with "dummy2lsp"
         end)
     )
 end)

@@ -27,9 +27,9 @@ function M.setup(config)
     local registry = require "mason-registry"
     registry.refresh(vim.schedule_wrap(function()
         if not platform.is_headless and #settings.current.ensure_installed > 0 then
-            require "mason-lspconfig.ensure_installed"()
+            require "lua.mason-lspconfig.features.ensure_installed"()
         end
-        require "mason-lspconfig.automatic_enable"
+        require "lua.mason-lspconfig.features.automatic_enable"()
         registry.register_package_aliases(_.map(function(server_name)
             return { server_name }
         end, require("mason-lspconfig.mappings").get_mason_map().package_to_lspconfig))
