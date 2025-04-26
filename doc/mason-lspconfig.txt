@@ -79,17 +79,17 @@ COMMANDS                                            *mason-lspconfig-commands*
 INSTALLING AN LSP SERVER
                                                                  *:LspInstall*
 >vim
-:LspInstall [<server>...]
+:LspInstall [<server> ...]
 <
 Installs the provided servers. This command only accepts servers that have a
 corresponding server configuration in `nvim-lspconfig`.
 
-You may also provide a language, like `:LspInstall typescript`. This will
+You may also provide a |'filetype'| like `:LspInstall typescript`. This will
 prompt you with a selection of all available servers for that given language.
 
 When the command is ran without any arguments, the currently active buffer's
 'filetype' will be used to identify relevant servers, and you will be prompted
-with a selection of all suggested servers.
+with a selection of servers for the current |'filetype'|.
 
 ------------------------------------------------------------------------------
 UNINSTALLING AN LSP SERVER

@@ -128,8 +128,9 @@ require("mason-lspconfig").setup {
 
 > `:h mason-lspconfig-commands`
 
-- `:LspInstall [<server>...]` - installs the provided servers
-- `:LspUninstall <server> ...` - uninstalls the provided servers
+- `:LspInstall [<server> ...]`: Installs the provided servers. If no server is provided you will be prompted to select a
+  server based on the current buffer's `&filetype`.
+- `:LspUninstall <server> ...`: Uninstalls the provided servers.
 
 # Configuration
 
