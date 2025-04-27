@@ -3,6 +3,8 @@ local mappings = require "mason-lspconfig.mappings"
 local registry = require "mason-registry"
 local settings = require "mason-lspconfig.settings"
 
+local enabled_servers = {}
+
 ---@param mason_pkg string | Package
 local function enable_server(mason_pkg)
     if type(mason_pkg) ~= "string" then
@@ -10,6 +12,9 @@ local function enable_server(mason_pkg)
     end
     local lspconfig_name = mappings.get_mason_map().package_to_lspconfig[mason_pkg]
     if not lspconfig_name then
+        return
+    end
+    if enabled_servers[lspconfig_name] then
         return
     end
 
@@ -40,15 +45,21 @@ local function enable_server(mason_pkg)
     end
 
     vim.lsp.enable(lspconfig_name)
+    enabled_servers[lspconfig_name] = true
 end
 
 local enable_server_scheduled = vim.schedule_wrap(enable_server)
 
-return function()
-    _.each(enable_server, registry.get_installed_package_names())
-
-    -- We deregister the event handler primarily for testing purposes where .setup() is called multiple times in the
-    -- same instance
-    registry:off("package:install:success", enable_server_scheduled)
-    registry:on("package:install:success", enable_server_scheduled)
-end
+return {
+    init = function()
+        enabled_servers = {}
+        _.each(enable_server, registry.get_installed_package_names())
+        -- We deregister the event handler primarily for testing purposes where .setup() is called multiple times in the
+        -- same instance.
+        registry:off("package:install:success", enable_server_scheduled)
+        registry:on("package:install:success", enable_server_scheduled)
+    end,
+    enable_all = function()
+        _.each(enable_server, registry.get_installed_package_names())
+    end,
+}

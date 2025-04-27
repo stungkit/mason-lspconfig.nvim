@@ -25,15 +25,21 @@ function M.setup(config)
     check_and_notify_bad_setup_order()
 
     local registry = require "mason-registry"
-    registry.refresh(vim.schedule_wrap(function()
+    registry.refresh(vim.schedule_wrap(function(success, updated_registries)
         if not platform.is_headless and #settings.current.ensure_installed > 0 then
             require "mason-lspconfig.features.ensure_installed"()
         end
-        require "mason-lspconfig.features.automatic_enable"()
+        if success and #updated_registries > 0 and settings.current.automatic_enable ~= false then
+            require("mason-lspconfig.features.automatic_enable").enable_all()
+        end
         registry.register_package_aliases(_.map(function(server_name)
             return { server_name }
         end, require("mason-lspconfig.mappings").get_mason_map().package_to_lspconfig))
     end))
+
+    if settings.current.automatic_enable ~= false then
+        require("mason-lspconfig.features.automatic_enable").init()
+    end
 
     require "mason-lspconfig.api.command"
 end
