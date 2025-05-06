@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0](https://github.com/williamboman/mason.nvim/compare/v1.32.0...v2.0.0) (2025-05-06)
+## [2.0.0](https://github.com/williamboman/mason-lspconfig.nvim/compare/v1.32.0...v2.0.0) (2025-05-06)
 
 This release adds support for the new native LSP configuration mechanism (see `vim.lsp.config`) added in Neovim v0.11.
 As a result, some existing features have been removed and a new `automatic_enable` feature has been added.
