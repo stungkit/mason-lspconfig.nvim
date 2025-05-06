@@ -1,5 +1,62 @@
 # Changelog
 
+## [2.0.0](https://github.com/williamboman/mason.nvim/compare/v1.32.0...v2.0.0) (2025-05-06)
+
+This release adds support for the new native LSP configuration mechanism (see `vim.lsp.config`) added in Neovim v0.11.
+As a result, some existing features have been removed and a new `automatic_enable` feature has been added.
+`mason-lspconfig.nvim` now tries to get out of the way as much as possible and instead allow users to entirely rely on
+the new LSP configuration mechanism, while providing some convenient QoL features on top.
+
+> [!NOTE]
+> Not all LSP configurations in nvim-lspconfig have been migrated to `vim.lsp.config` yet. These servers will have to be
+> manually set up (`require("lspconfig").apex_ls.setup {}`). A full list may be found
+> [here](https://github.com/neovim/nvim-lspconfig/issues/3705).
+
+### Repository has been moved
+
+The repository has been transferred to the [`mason-org`](https://github.com/mason-org) organization. The new URL is
+https://github.com/mason-org/mason-lspconfig.nvim. The previous URL will continue to function as a redirect to the new
+URL but users are recommended to update to the new location.
+
+### New location for server mappings
+
+Server mappings are now hosted via the [registry](https://github.com/mason-org/mason-registry) instead of bundled with `mason-lspconfig.nvim` itself.
+
+### Removed Features
+
+- Remove the `handlers` setting and `.setup_handlers()` function. It has been replaced by the new native
+  `vim.lsp.config()` API and a new `automatic_enable` setting.
+- Remove the `automatic_installation` setting. This feature is no longer compatible with the new native LSP
+  configuration mechanism.
+
+### New Features
+
+- Add new `automatic_enable` setting to automatically `vim.lsp.enable()` installed servers. It is by default activated.
+
+### Example Setup
+
+```lua
+-- Configure a server via `vim.lsp.config()` or `{after/}lsp/lua_ls.lua`
+vim.lsp.config('lua_ls', {
+  settings = {
+    Lua = {
+      runtime = {
+        version = 'LuaJIT',
+      },
+      diagnostics = {
+        globals = {
+          'vim',
+          'require',
+        },
+      },
+    },
+  },
+})
+
+require("mason").setup()
+require("mason-lspconfig").setup() -- Note: `nvim-lspconfig` needs to be in 'runtimepath' by the time you setup
+```
+
 ## [1.32.0](https://github.com/williamboman/mason-lspconfig.nvim/compare/v1.31.0...v1.32.0) (2025-02-14)
 
 
